@@ -49,9 +49,36 @@ const updateTicket = async (data) => {
   }
 };
 
+const consumeMessageQueueEvent = async (payload) => {
+  console.log("Payload in service: ", payload);
+  const { eventName, recipientEmail, subject, content, notificationTime } =
+    payload;
+  switch (payload.eventName) {
+    case "EMAIL_NOTIFICATION":
+      sendBasicEmail(
+        "support@airlines.com",
+        payload.recipientEmail,
+        payload.subject,
+        payload.content,
+      );
+      break;
+    case "SCHEDULE_EMAIL":
+      await createNotification({
+        recipientEmail,
+        subject,
+        content,
+        notificationTime,
+      });
+      break;
+    default:
+      break;
+  }
+};
+
 module.exports = {
   sendBasicEmail,
   fetchPendingEmails,
   createNotification,
   updateTicket,
+  consumeMessageQueueEvent,
 };
